@@ -21,6 +21,7 @@
 #define timer (*(volatile uint32_t*)0x08000000)
 
 // Memory mapped oscillators
+static uint32_t * oscs = 0x10000000;
 #define osc1 (*(volatile uint32_t*)0x10000000)
 #define osc2 (*(volatile uint32_t*)0x10000004)
 #define osc3 (*(volatile uint32_t*)0x10000008)
@@ -35,7 +36,7 @@
 #define set_release(x,a) 	x = 	(x & 0xFFF0FFFF) 	| ((a & 0x0000000F) << 16)
 
 // Memory mapped echo
-#define echo_offset (*(volatile uint32_t*)0x10000018)
+#define echo_delay (*(volatile uint32_t*)0x10000018)
 
 // Memory mapped triggers and enablers
 #define triggers (*(volatile uint32_t*)0x10000010)
@@ -51,5 +52,57 @@
 #define toogle_trigger(n)		triggers ^= 1UL << n
 #define get_trigger(n)			(triggers >> n) & 1U
 #define set_trigger(n,v)		(v) ? enable_trigger(n) : disable_trigger(n)
+
+// Memory mapped matrix
+#define matrix_1 (*(volatile uint32_t*)0x1000001C)
+#define matrix_2 (*(volatile uint32_t*)0x10000020)
+#define MATRIX_IN 9
+#define MATRIX_OUT 11
+
+#define MATRIX_MIXER4_IN_1 1
+#define MATRIX_MIXER4_IN_2 2
+#define MATRIX_MIXER4_IN_3 3
+#define MATRIX_MIXER4_IN_4 4
+#define MATRIX_MULT_IN_1   5
+#define MATRIX_MULT_IN_2   6
+#define MATRIX_ECHO_IN     7
+#define MATRIX_OUTPUT_R    8
+#define MATRIX_OUTPUT_L    9
+
+static const char *matrix_out_names[MATRIX_OUT+1] = {"", "MATRIX_MIXER4_IN_1",
+                                          "MATRIX_MIXER4_IN_2",
+                                          "MATRIX_MIXER4_IN_3",
+                                          "MATRIX_MIXER4_IN_4",
+                                          "MATRIX_MULT_IN_1",
+                                          "MATRIX_MULT_IN_2",
+                                          "MATRIX_ECHO_IN",
+                                          "MATRIX_OUTPUT_R",
+                                          "MATRIX_OUTPUT_L"};
+
+#define MATRIX_NONE         0
+#define MATRIX_OSC_1        1
+#define MATRIX_OSC_2        2
+#define MATRIX_OSC_3        3
+#define MATRIX_OSC_4        4
+#define MATRIX_MIXER4_OUT   5
+#define MATRIX_MULT_OUT     6
+#define MATRIX_ECHO_OUT     7
+#define MATRIX_ENVELOPE_OUT 8
+
+static const char *matrix_in_names[MATRIX_IN] = {"MATRIX_NONE",
+                                                    "MATRIX_OSC_1",
+                                                    "MATRIX_OSC_2",
+                                                    "MATRIX_OSC_3",
+                                                    "MATRIX_OSC_4",
+                                                    "MATRIX_MIXER4_OUT",
+                                                    "MATRIX_MULT_OUT",
+                                                    "MATRIX_ECHO_OUT",
+                                                    "MATRIX_ENVELOPE_OUT"};
+
+
+
+#define set_matrix_1(in, out) 	 matrix_1 = ((matrix_1 & ~(0xF << (4*(out-1)))) | ((in & 0xF) << (4*(out-1))))
+#define set_matrix_2(in, out) 	 matrix_2 = ((matrix_2 & ~(0xF << (4*(out-1)))) | ((in & 0xF) << (4*(out-1))))
+#define set_matrix(in, out) 	 if(out <= 8){set_matrix_1(in, out);}else{set_matrix_2(in, out-8);};
 
 #endif  // _ROCKETFPGA_H

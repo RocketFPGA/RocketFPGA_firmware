@@ -11,18 +11,18 @@ uint8_t counter = 0;
 uint32_t bpm = CLK_HZ; 
 
 void  isr_irq(void){
-	if ( (gpio & GPIO_LED))
-	{
-			timer = timer + bpm/6;
-	}else{
-		timer = timer + bpm/8;
-		osc1 = phase_from_freq(osc1_main * (counter + 1));
-		osc2 = phase_from_freq(osc2_main * (counter + 1));
-		counter = (counter + 1) % 4;
-	}
-	gpio = !(gpio & GPIO_LED);
+	// if ( (gpio & GPIO_LED))
+	// {
+	// 		timer = timer + bpm/6;
+	// }else{
+	// 	timer = timer + bpm/8;
+	// 	osc1 = phase_from_freq(osc1_main * (counter + 1));
+	// 	osc2 = phase_from_freq(osc2_main * (counter + 1));
+	// 	counter = (counter + 1) % 4;
+	// }
+	// gpio = !(gpio & GPIO_LED);
 
-	toogle_trigger(ADRS_TRIGGER);
+	// toogle_trigger(ADRS_TRIGGER);
 }
 
 void print_osc(){
@@ -33,14 +33,9 @@ void print_osc(){
 }
 
 void main(){
-	irq_enable(7);
-	timer = timer + CLK_HZ;
-	irq_global_enable();
-
-	osc3 = phase_from_freq(3500);
-	osc4 = phase_from_freq(70);
-
-	echo_offset = 0;
+	// irq_enable(7);
+	// timer = timer + CLK_HZ;
+	// irq_global_enable();
 	
 	uint8_t attack = 1;
 	uint8_t decay = 8;
@@ -51,6 +46,20 @@ void main(){
 	set_decay(adsr,decay);	
 	set_sustain(adsr,sustain);
 	set_release(adsr,release);
+
+	// set_matrix(MATRIX_OSC_2, MATRIX_MIXER4_IN_1);
+	// set_matrix(MATRIX_OSC_1, MATRIX_MIXER4_IN_2);
+	// set_matrix(MATRIX_OSC_1, MATRIX_ECHO_IN);
+	// set_matrix(MATRIX_ECHO_OUT, MATRIX_MIXER4_IN_3);
+	// set_matrix(MATRIX_MIXER4_OUT, MATRIX_OUTPUT_L);
+	// set_matrix(MATRIX_MIXER4_OUT, MATRIX_OUTPUT_R);
+
+	// set_matrix(MATRIX_OSC_1, MATRIX_MIXER4_IN_1);
+	// set_matrix(MATRIX_OSC_2, MATRIX_MIXER4_IN_2);
+	// set_matrix(MATRIX_OSC_3, MATRIX_MIXER4_IN_3);
+	// set_matrix(MATRIX_OSC_4, MATRIX_MIXER4_IN_4);
+	// set_matrix(MATRIX_MIXER4_OUT, MATRIX_OUTPUT_L);
+	// set_matrix(MATRIX_MIXER4_OUT, MATRIX_OUTPUT_R);
 
 	while (getchar() != '\n');
 
@@ -66,101 +75,9 @@ void main(){
 	printf("\n");
 	printf(">");
 
+
 	while (1){
-		char read = getchar();
-		if (read == '\r'){
-			read = getchar();
-		}
-		
-		if (read == 'a'){
-			printf("\nThe Hardcore Audio Processor");
-			printf("\nButton: %d", (gpio & GPIO_BUTTON) >> 1);
-
-		// ECHO MANAGEMENT
-		}else if (read == 'd'){
-			toogle_trigger(ECHO_ENABLE);
-			printf("Toggling echo: %d \n", get_trigger(ECHO_ENABLE) );
-		}else if (read == 'e'){
-			echo_offset = echo_offset + 1000;
-			printf("Echo: %d\n", echo_offset);
-		}else if (read == 'w'){
-			echo_offset = echo_offset - 1000;
-			printf("Echo: %d\n", echo_offset);
-
-		// OSCILLATORS
-		}else if (read == 'r'){
-			toogle_trigger(OSC1_ENABLE);
-		}else if (read == 'f'){
-			osc1_main = osc1_main + phase_from_freq(100);
-			print_osc();
-		}else if (read == 'v'){
-			osc1_main = osc1_main - phase_from_freq(100);
-			print_osc();
-		
-		}else if (read == 't'){
-			toogle_trigger(OSC2_ENABLE);
-		}else if (read == 'g'){
-			osc2_main = osc2_main + phase_from_freq(100);
-			print_osc();
-		}else if (read == 'b'){
-			osc2_main = osc2_main - phase_from_freq(100);
-			print_osc();
-		
-		}else if (read == 'y'){
-			toogle_trigger(OSC3_ENABLE);
-		}else if (read == 'h'){
-			osc3 = osc3 + phase_from_freq(100);
-			print_osc();
-		}else if (read == 'n'){
-			osc3 = osc3 - phase_from_freq(100);
-			print_osc();
-		
-		}else if (read == 'u'){
-			toogle_trigger(OSC4_ENABLE);
-		}else if (read == 'j'){
-			osc4 = osc4 + phase_from_freq(10);
-			print_osc();
-		}else if (read == 'm'){
-			osc4 = osc4 - phase_from_freq(10);
-			print_osc();
-		}
-
-		if (read == '3')
-			attack++;
-		if (read == '4')
-			attack--;
-		if (read == '5')
-			sustain++;
-		if (read == '6')
-			sustain--;
-
-		if (read == '+'){
-			bpm = bpm - 100000;
-			printf("BPM: %d\n", bpm);
-		}
-
-		if (read == '-'){
-			bpm = bpm + 100000;
-			printf("BPM: %d\n", bpm);
-		}
-	
-		if (read == 'p'){
-			disable_trigger(OSC1_ENABLE);
-			disable_trigger(OSC2_ENABLE);
-			disable_trigger(OSC3_ENABLE);
-			disable_trigger(OSC4_ENABLE);
-
-			attack = 1;
-			decay = 8;
-			sustain = 3;
-			release = 8;
-		}
-
-		set_attack(adsr,attack);
-		set_decay(adsr,decay);	
-		set_sustain(adsr,sustain);
-		set_release(adsr,release);
-
-		printf("\n>");
+		read_rocket_command();
+		printf(">");
 	}
 }
