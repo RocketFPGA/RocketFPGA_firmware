@@ -10,7 +10,7 @@ typedef enum {
 	ADSR,
 	ECHO,
 	MATRIX,
-	ERROR
+	ERROR,
 } cmd_type ; 
 
 typedef struct err_cmd {
@@ -76,10 +76,10 @@ void read_rocket_command(){
 		break;
 	case ADSR:
 		printf("Setting up adsr\n");
-		set_attack(adsr,cmd.adrs.attack);
-		set_decay(adsr,cmd.adrs.decay);	
-		set_sustain(adsr,cmd.adrs.sustain);
-		set_release(adsr,cmd.adrs.release);
+		set_attack(adsr1,cmd.adrs.attack);
+		set_decay(adsr1,cmd.adrs.decay);	
+		set_sustain(adsr1,cmd.adrs.sustain);
+		set_release(adsr1,cmd.adrs.release);
 		break;
 	case MATRIX:
 		printf("Routing %s to %s\n", matrix_in_names[cmd.matrix.in], matrix_out_names[cmd.matrix.out]);

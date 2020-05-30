@@ -27,16 +27,8 @@ static uint32_t * oscs = 0x10000000;
 #define osc3 (*(volatile uint32_t*)0x10000008)
 #define osc4 (*(volatile uint32_t*)0x1000000C)
 
-// Memory mapped ADSR
-#define adsr (*(volatile uint32_t*)0x10000014)
-
-#define set_attack(x,a) 	x = 	(x & 0x0FFFFFFF) 	| ((a & 0x0000000F) << 28)
-#define set_decay(x,a) 		x = 	(x & 0xF0FFFFFF) 	| ((a & 0x0000000F) << 24)
-#define set_sustain(x,a) 	x = 	(x & 0xFF0FFFFF) 	| ((a & 0x0000000F) << 20)
-#define set_release(x,a) 	x = 	(x & 0xFFF0FFFF) 	| ((a & 0x0000000F) << 16)
-
 // Memory mapped echo
-#define echo_delay (*(volatile uint32_t*)0x10000018)
+#define echo_delay (*(volatile uint32_t*)0x10000014)
 
 // Memory mapped triggers and enablers
 #define triggers (*(volatile uint32_t*)0x10000010)
@@ -54,8 +46,8 @@ static uint32_t * oscs = 0x10000000;
 #define set_trigger(n,v)		(v) ? enable_trigger(n) : disable_trigger(n)
 
 // Memory mapped matrix
-#define matrix_1 (*(volatile uint32_t*)0x1000001C)
-#define matrix_2 (*(volatile uint32_t*)0x10000020)
+#define matrix_1 (*(volatile uint32_t*)0x10000018)
+#define matrix_2 (*(volatile uint32_t*)0x1000001C)
 #define MATRIX_IN 9
 #define MATRIX_OUT 11
 
@@ -104,5 +96,16 @@ static const char *matrix_in_names[MATRIX_IN] = {"MATRIX_NONE",
 #define set_matrix_1(in, out) 	 matrix_1 = ((matrix_1 & ~(0xF << (4*(out-1)))) | ((in & 0xF) << (4*(out-1))))
 #define set_matrix_2(in, out) 	 matrix_2 = ((matrix_2 & ~(0xF << (4*(out-1)))) | ((in & 0xF) << (4*(out-1))))
 #define set_matrix(in, out) 	 if(out <= 8){set_matrix_1(in, out);}else{set_matrix_2(in, out-8);};
+
+// Memory mapped ADSR
+static uint32_t * adsr1 = 0x10000020;
+
+#define set_attack(x,a) 	x[0] = 	(x[0] & 0x0000FFFF) 	| ((a & 0x0000FFFF) << 16)
+#define set_decay(x,a) 		x[0] = 	(x[0] & 0xFFFF0000) 	| (a & 0x0000FFFF)
+#define set_sustain(x,a) 	x[1] = 	(x[1] & 0x0000FFFF) 	| ((a & 0x0000FFFF) << 16)
+#define set_release(x,a) 	x[1] = 	(x[1] & 0xFFFF0000) 	| (a & 0x0000FFFF)
+
+// Memory mapped ADC
+#define adc_1 (*(volatile uint32_t*)0x10010000)
 
 #endif  // _ROCKETFPGA_H
