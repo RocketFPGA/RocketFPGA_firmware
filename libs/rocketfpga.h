@@ -27,6 +27,19 @@ static uint32_t * oscs = 0x10000000;
 #define osc3 (*(volatile uint32_t*)0x10000008)
 #define osc4 (*(volatile uint32_t*)0x1000000C)
 
+#define osc_type (*(volatile uint32_t*)0x10000028)
+#define OSC1_TYPE 30
+#define OSC2_TYPE 28
+#define OSC3_TYPE 26
+#define OSC4_TYPE 24
+
+#define SINE_TYPE 0
+#define RAMP_TYPE 1
+#define SQUARE_TYPE 2
+#define TRIANGLE_TYPE 3
+
+#define set_osc_type(x,a) 	osc_type = 	(osc_type & ~(0x3 << x)) | ((a & 0x3) << x)
+
 // Memory mapped echo
 #define echo_delay (*(volatile uint32_t*)0x10000014)
 
@@ -48,8 +61,8 @@ static uint32_t * oscs = 0x10000000;
 // Memory mapped matrix
 #define matrix_1 (*(volatile uint32_t*)0x10000018)
 #define matrix_2 (*(volatile uint32_t*)0x1000001C)
-#define MATRIX_IN 9
-#define MATRIX_OUT 11
+#define MATRIX_IN 10
+#define MATRIX_OUT 12
 
 #define MATRIX_MIXER4_IN_1 1
 #define MATRIX_MIXER4_IN_2 2
@@ -60,6 +73,8 @@ static uint32_t * oscs = 0x10000000;
 #define MATRIX_ECHO_IN     7
 #define MATRIX_OUTPUT_R    8
 #define MATRIX_OUTPUT_L    9
+#define MATRIX_MOD_IN_1    10
+#define MATRIX_MOD_IN_2    11
 
 static const char *matrix_out_names[MATRIX_OUT+1] = {"", "MATRIX_MIXER4_IN_1",
                                           "MATRIX_MIXER4_IN_2",
@@ -69,7 +84,9 @@ static const char *matrix_out_names[MATRIX_OUT+1] = {"", "MATRIX_MIXER4_IN_1",
                                           "MATRIX_MULT_IN_2",
                                           "MATRIX_ECHO_IN",
                                           "MATRIX_OUTPUT_R",
-                                          "MATRIX_OUTPUT_L"};
+                                          "MATRIX_OUTPUT_L",
+                                          "MATRIX_MOD_IN_1",
+                                          "MATRIX_MOD_IN_2"};
 
 #define MATRIX_NONE         0
 #define MATRIX_OSC_1        1
@@ -80,6 +97,8 @@ static const char *matrix_out_names[MATRIX_OUT+1] = {"", "MATRIX_MIXER4_IN_1",
 #define MATRIX_MULT_OUT     6
 #define MATRIX_ECHO_OUT     7
 #define MATRIX_ENVELOPE_OUT 8
+#define MATRIX_MOD_OUT      9
+#define MATRIX_LINE_MIC     10
 
 static const char *matrix_in_names[MATRIX_IN] = {"MATRIX_NONE",
                                                     "MATRIX_OSC_1",
@@ -89,7 +108,9 @@ static const char *matrix_in_names[MATRIX_IN] = {"MATRIX_NONE",
                                                     "MATRIX_MIXER4_OUT",
                                                     "MATRIX_MULT_OUT",
                                                     "MATRIX_ECHO_OUT",
-                                                    "MATRIX_ENVELOPE_OUT"};
+                                                    "MATRIX_ENVELOPE_OUT",
+                                                    "MATRIX_MOD_OUT",
+                                                    "MATRIX_LINE_MIC"};
 
 
 
@@ -107,5 +128,12 @@ static uint32_t * adsr1 = 0x10000020;
 
 // Memory mapped ADC
 #define adc_1 (*(volatile uint32_t*)0x10010000)
+
+// Memory mapped modulator
+#define modulator1 (*(volatile uint32_t*)0x1000002C)
+
+#define set_modulation_gain(a) 	    modulator1 = 	(modulator1 & 0x0000FFFF) 	| ((a & 0x0000FFFF) << 16)
+#define set_modulation_offset(a) 	modulator1 = 	(modulator1 & 0xFFFF0000) 	| (a & 0x0000FFFF)
+
 
 #endif  // _ROCKETFPGA_H
