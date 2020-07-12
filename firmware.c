@@ -3,6 +3,7 @@
 
 #include "libs/printf.h"
 #include "libs/rocketfpga.h"
+#include "libs/rocketfpga_codec.h"
 
 #define codec (*(volatile uint32_t*) 0x01000000)
 
@@ -49,14 +50,9 @@ void  isr_irq(void){
 }
 
 void main(){
-	// irq_enable(7);
-	// timer = timer + bpm;
-	// irq_global_enable();
-	
-	// set_matrix(MATRIX_OSC_1, MATRIX_MULT_IN_1);
-	// set_matrix(MATRIX_ENVELOPE_OUT,MATRIX_MULT_IN_2);
-
-	// set_matrix(MATRIX_MULT_OUT, MATRIX_ECHO_IN);
+	irq_enable(7);
+	timer = timer + bpm;
+	irq_global_enable();
 
 
 	osc1 = phase_from_freq(200);
@@ -79,22 +75,6 @@ void main(){
 	echo_delay = 5000;
 	enable_trigger(ECHO_ENABLE);
 
-	// set_attack(adsr1, 1000);
-	// set_decay(adsr1, 100);
-	// set_sustain(adsr1, 1);
-	// set_release(adsr1, 1000);
-
-	// while (1)
-	// {
-	// 	if(gpio && GPIO_BUTTON){
-	// 		osc1 = phase_from_freq(filter_out);
-	// 	}
-	// 	filter_out = (uint32_t)((float)filter_out - (beta * ((float)filter_out - adc_1)));
-	// }
-	
-
-	// while (getchar() != '\n');
-
 	printf("\n");
 	printf("  _____            _        _   ______ _____   _____          \n");
 	printf(" |  __ \\          | |      | | |  ____|  __ \\ / ____|   /\\    \n");
@@ -111,10 +91,7 @@ void main(){
 
 	uint8_t i = 0;
 	while (1){
-		set_codec_headphone_volume(i++);
-		printf("%d\n",i);
-		delay(1000);
-		// read_rocket_command();
-		// printf(">");
+		read_rocket_command();
+		printf(">");
 	}
 }

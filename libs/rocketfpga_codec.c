@@ -29,7 +29,7 @@ void init_codec(){
 	set_codec_analog_path(DACSEL, 1);
 	set_codec_analog_path(SIDETONE, 0);
 
-	set_codec_digital_path(ADCHPD, 0);
+	set_codec_digital_path(ADCHPD, 1);
 	set_codec_deemphasis(DEEMPH_DISABLE);
 	set_codec_digital_path(DACMU, 0);
 	set_codec_digital_path(HPOR, 0);
@@ -108,14 +108,14 @@ void set_codec_powerdown(uint8_t section, bool value){
 }
 
 void set_codec_powerdown_all(bool value){
-	set_codec_power(LINEINPD, value);
-	set_codec_power(MICPD, value);
-	set_codec_power(ADCPD, value);
-	set_codec_power(DACPD, value);
-	set_codec_power(OUTPD, value);
-	set_codec_power(OSCPD, value);
-	set_codec_power(CLKOUTPD, value);
-	set_codec_power(POWEROFFPD, value);
+	set_codec_powerdown(LINEINPD, value);
+	set_codec_powerdown(MICPD, value);
+	set_codec_powerdown(ADCPD, value);
+	set_codec_powerdown(DACPD, value);
+	set_codec_powerdown(OUTPD, value);
+	set_codec_powerdown(OSCPD, value);
+	set_codec_powerdown(CLKOUTPD, value);
+	set_codec_powerdown(POWEROFFPD, value);
 }
 
 // CODEC_ANALOGUE_PATH_REG
@@ -212,11 +212,11 @@ void set_codec_sampling_reg(uint8_t section, bool value){
 }
 
 void set_codec_sampling(uint8_t sampling){
-	uint16_t aux = get_codec_reg(CODEC_DIGITAL_IFACE_REG);
+	uint16_t aux = get_codec_reg(CODEC_SAMPLING_REG);
 	aux &= ~(0xF << SR);
 	aux |= sampling << SR;
 
-	set_codec_reg(CODEC_DIGITAL_IFACE_REG, aux);
+	set_codec_reg(CODEC_SAMPLING_REG, aux);
 }
 
 // CODEC_ACTIVE_REG 

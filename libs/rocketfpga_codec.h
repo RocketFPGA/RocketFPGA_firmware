@@ -8,7 +8,6 @@
 #define set_bit(data, bit)                  data |= 1UL << bit
 #define unset_bit(data, bit)   		        data &= ~(1UL << bit)
 
-
 // WM8731 Registers
 #define CODEC_LEFT_LINE_REG        0x00  
 #define CODEC_RIGHT_LINE_REG       0x01  
@@ -85,5 +84,49 @@
 #define SR_48K_48K_12_288M    0b0000
 #define SR_96K_96K_12_288M    0b0111
 // Not completed SR, see page 41 in datasheet
+
+
+
+void init_codec();
+void reset_codec();
+
+// WM8731 Registers
+uint16_t get_codec_reg(uint8_t reg);
+void set_codec_reg(uint8_t reg, uint16_t value);
+
+// Volume
+void set_codec_left_line_volume(uint8_t vol);
+void set_codec_right_line_volume(uint8_t vol);
+void set_codec_line_volume(uint8_t vol);
+void set_codec_left_headphone_volume(uint8_t vol);
+void set_codec_right_headphone_volume(uint8_t vol);
+void set_codec_headphone_volume(uint8_t vol);
+
+// CODEC_POWER_CTL_REG
+void set_codec_powerdown(uint8_t section, bool value);
+
+void set_codec_powerdown_all(bool value);
+
+// CODEC_ANALOGUE_PATH_REG
+void set_codec_analog_path(uint8_t section, bool value);
+void set_codec_mic_input();
+void set_codec_line_input();
+void set_codec_sidetone_att(uint8_t attenuation);
+
+// CODEC_DIGITAL_PATH_REG
+void set_codec_digital_path(uint8_t section, bool value);
+void set_codec_deemphasis(uint8_t deemphasis);
+
+// CODEC_DIGITAL_IFACE_REG
+void set_codec_digital_iface(uint8_t section, bool value);
+void set_codec_format(uint8_t format);
+void set_codec_iwl(uint8_t lenght);
+
+// CODEC_SAMPLING_REG
+void set_codec_sampling_reg(uint8_t section, bool value);
+void set_codec_sampling(uint8_t sampling);
+
+// CODEC_ACTIVE_REG 
+void set_codec_active(bool value);
 
 #endif  // _ROCKETFPGA_CODEC_H
