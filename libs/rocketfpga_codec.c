@@ -14,32 +14,6 @@ uint16_t codec_reg_map[9] = {	0b010010111,
 								0b000000000};
 
 void init_codec(){
-	// write_codec_command(0xFF, 0xAAA);
-
-	// write_codec_command(0x0F, 0x000);
-	// write_codec_command(0x06, 0x000);
-	// write_codec_command(0x06, 0x010);
-	// write_codec_command(0x00, 0x11F);
-	// write_codec_command(0x02, 0x11F);
-	// write_codec_command(0x04, 0x015);
-	// write_codec_command(0x05, 0x001);
-	// write_codec_command(0x07, 0x053);
-	// write_codec_command(0x08, 0x000);
-	// write_codec_command(0x09, 0x001);
-	// write_codec_command(0x06, 0x000);
-
-	// write_codec_command(0x0F, 0x000);
-	// write_codec_command(0x06, 0x000);
-	// write_codec_command(0x06, 0b000010000);
-	// write_codec_command(0x00, 0b100011111);
-	// write_codec_command(0x02, 0b101111111);
-	// write_codec_command(0x04, 0b000010101);
-	// write_codec_command(0x05, 0b000000001);
-	// write_codec_command(0x07, 0b001010011);
-	// write_codec_command(0x08, 0b000000000);
-	// write_codec_command(0x09, 0b000000001);
-	// write_codec_command(0x06, 0b000000000);
-
 	reset_codec();
 
 	set_codec_powerdown_all(0);
