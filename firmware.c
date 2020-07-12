@@ -4,6 +4,9 @@
 #include "libs/printf.h"
 #include "libs/rocketfpga.h"
 
+#define codec (*(volatile uint32_t*) 0x01000000)
+
+
 uint32_t osc1_main = 70;
 uint32_t osc2_main = 130;
 uint8_t counter = 0; 
@@ -56,21 +59,21 @@ void main(){
 	// set_matrix(MATRIX_MULT_OUT, MATRIX_ECHO_IN);
 
 
-	osc1 = phase_from_freq(500);
-	osc2 = phase_from_freq(10);
+	osc1 = phase_from_freq(200);
+	osc2 = phase_from_freq(200);
 	set_matrix(MATRIX_OSC_1, MATRIX_MOD_IN_1);
 	set_matrix(MATRIX_OSC_2, MATRIX_MOD_IN_2);
 	
 	set_osc_type(OSC1_TYPE, 0);
-	set_osc_type(OSC2_TYPE, 3);
+	set_osc_type(OSC2_TYPE, 0);
 
 	set_modulation_gain(0x3FFF);
 	set_modulation_offset(0x3FFF);
 
 	set_matrix(MATRIX_MOD_OUT, MATRIX_ECHO_IN);
 
-	set_matrix(MATRIX_MOD_OUT, MATRIX_OUTPUT_R);
-	set_matrix(MATRIX_MOD_OUT, MATRIX_OUTPUT_L);
+	set_matrix(MATRIX_OSC_1, MATRIX_OUTPUT_R);
+	set_matrix(MATRIX_OSC_2, MATRIX_OUTPUT_L);
 
 	
 	echo_delay = 5000;
@@ -90,7 +93,7 @@ void main(){
 	// }
 	
 
-	while (getchar() != '\n');
+	// while (getchar() != '\n');
 
 	printf("\n");
 	printf("  _____            _        _   ______ _____   _____          \n");
@@ -103,10 +106,15 @@ void main(){
 	printf(" The Hardcore Audio Processor\n");
 	printf("\n");
 	printf(">");
+		
+	init_codec();
 
+	uint8_t i = 0;
 	while (1){
-			init_codec();
-		read_rocket_command();
-		printf(">");
+		set_codec_headphone_volume(i++);
+		printf("%d\n",i);
+		delay(1000);
+		// read_rocket_command();
+		// printf(">");
 	}
 }
