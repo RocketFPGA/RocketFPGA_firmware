@@ -50,9 +50,9 @@ void  isr_irq(void){
 }
 
 void main(){
-	irq_enable(7);
-	timer = timer + bpm;
-	irq_global_enable();
+	// irq_enable(7);
+	// timer = timer + bpm;
+	// irq_global_enable();
 
 
 	osc1 = phase_from_freq(200);
@@ -60,8 +60,8 @@ void main(){
 	set_matrix(MATRIX_OSC_1, MATRIX_MOD_IN_1);
 	set_matrix(MATRIX_OSC_2, MATRIX_MOD_IN_2);
 	
-	set_osc_type(OSC1_TYPE, 0);
-	set_osc_type(OSC2_TYPE, 0);
+	// set_osc_type(OSC1_TYPE, 3);
+	set_osc_type(OSC2_TYPE, 3);
 
 	set_modulation_gain(0x3FFF);
 	set_modulation_offset(0x3FFF);
@@ -89,9 +89,11 @@ void main(){
 		
 	init_codec();
 
-	uint8_t i = 0;
+	overdrive = 10000;
 	while (1){
-		read_rocket_command();
-		printf(">");
+		// overdrive = overdrive + 1009;
+		delay(1000);
+		// read_rocket_command();
+		// printf(">");
 	}
 }

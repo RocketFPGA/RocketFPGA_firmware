@@ -136,4 +136,7 @@ static uint32_t * adsr1 = 0x10000020;
 #define set_modulation_offset(a) 	modulator1 = 	(modulator1 & 0xFFFF0000) 	| (a & 0x0000FFFF)
 
 
+// Memory mapped overdrive
+#define overdrive (*(volatile uint32_t*)0x10000030)
+
 #endif  // _ROCKETFPGA_H
