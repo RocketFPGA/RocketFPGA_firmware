@@ -118,13 +118,17 @@ static const char *matrix_in_names[MATRIX_IN] = {"MATRIX_NONE",
 #define set_matrix_2(in, out) 	 matrix_2 = ((matrix_2 & ~(0xF << (4*(out-1)))) | ((in & 0xF) << (4*(out-1))))
 #define set_matrix(in, out) 	 if(out <= 8){set_matrix_1(in, out);}else{set_matrix_2(in, out-8);};
 
-// Memory mapped ADSR
+// Memory mapped ADSR: assumes release and decay from max value
 static uint32_t * adsr1 = 0x10000020;
 
-#define set_attack(x,a) 	x[0] = 	(x[0] & 0x0000FFFF) 	| ((a & 0x0000FFFF) << 16)
-#define set_decay(x,a) 		x[0] = 	(x[0] & 0xFFFF0000) 	| (a & 0x0000FFFF)
-#define set_sustain(x,a) 	x[1] = 	(x[1] & 0x0000FFFF) 	| ((a & 0x0000FFFF) << 16)
-#define set_release(x,a) 	x[1] = 	(x[1] & 0xFFFF0000) 	| (a & 0x0000FFFF)
+#define ADSR_ACC_LEN 26
+#define ADSR_MAX_VALUE POWTWO(ADSR_ACC_LEN)
+#define ADSR_CLK 6000  // 6 kHz = 49.152 MHz / 2^(12+1)
+
+void set_attack(uint32_t * adsr, uint16_t ms);
+void set_decay(uint32_t * adsr, uint16_t ms);
+void set_sustain(uint32_t * adsr, float level);
+void set_release(uint32_t * adsr, uint16_t ms);
 
 // Memory mapped ADC
 #define adc_1 (*(volatile uint32_t*)0x10010000)
@@ -134,6 +138,5 @@ static uint32_t * adsr1 = 0x10000020;
 
 #define set_modulation_gain(a) 	    modulator1 = 	(modulator1 & 0x0000FFFF) 	| ((a & 0x0000FFFF) << 16)
 #define set_modulation_offset(a) 	modulator1 = 	(modulator1 & 0xFFFF0000) 	| (a & 0x0000FFFF)
-
 
 #endif  // _ROCKETFPGA_H
