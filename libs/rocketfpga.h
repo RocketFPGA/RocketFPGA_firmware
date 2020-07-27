@@ -118,56 +118,17 @@ static const char *matrix_in_names[MATRIX_IN] = {"MATRIX_NONE",
 #define set_matrix_2(in, out) 	 matrix_2 = ((matrix_2 & ~(0xF << (4*(out-1)))) | ((in & 0xF) << (4*(out-1))))
 #define set_matrix(in, out) 	 if(out <= 8){set_matrix_1(in, out);}else{set_matrix_2(in, out-8);};
 
-// Memory mapped ADSR
+// Memory mapped ADSR: assumes release and decay from max value
 static uint32_t * adsr1 = 0x10000020;
 
-// OSC = 49.152 MHz
-// ADSR_CLK = divider[12] = 49.152 MHz/(2^(12+1)) = 6 kHz
-// ADSR_LEN = 26
-// ADSR_ACC = 2^ADSR_LEN
-// ADSR_MAX_ACC =  ADSR_ACC - att
-// Attack time = (ADSR_MAX_ACC/att) / ADSR_CLK = ((ADSR_ACC - att)/att) / ADSR_CLK = (ADSR_ACC/att - 1) / ADSR_CLK
-// Sustain volume = ((sus & 0x0000FFFF) << (ADSR_LEN-1-16)) | 
-// Decay time = ((ADSR_MAX_ACC - Sustain volume)/dec) / ADSR_CLK 
-// Release time = (Sustain volume/rel) / ADSR_CLK
-// 
-// att = ADSR_ACC/((Attack time * ADSR_CLK) + 1)
-// dec = (ADSR_MAX_ACC - Sustain volume)/(Decay time * ADSR_CLK)
-// rel = Sustain volume/(Release time * ADSR_CLK)
-
-// SIMPLIFICATION: assumes release and decay from max value
-// Attack time =  (ADSR_ACC/att - 1) / ADSR_CLK
-// Decay time = (ADSR_MAX_ACC/dec) / ADSR_CLK 
-// Release time = (ADSR_MAX_ACC/rel) / ADSR_CLK
-// 
-// att = ADSR_ACC/((Attack time * ADSR_CLK) + 1)
-// dec = (ADSR_MAX_ACC)/(Decay time * ADSR_CLK)
-// rel = (ADSR_MAX_ACC)/(Release time * ADSR_CLK)
-
 #define ADSR_ACC_LEN 26
-#define ADSR_MAX_VALUE 2**ADSR_ACC_LEN
-#define ADSR_CLK 6000*1000
+#define ADSR_MAX_VALUE POWTWO(ADSR_ACC_LEN)
+#define ADSR_CLK 6000  // 6 kHz = 49.152 MHz / 2^(12+1)
 
-void set_attack(uint32_t * adsr, uint16_t ms){
-    uint16_t val = ADSR_MAX_VALUE/((ms * ADSR_CLK) + 1);
-    adsr[0] = 	(adsr[0] & 0x0000FFFF) 	| ((val & 0x0000FFFF) << 16);
-}
-
-void set_decay(uint32_t * adsr, uint16_t ms){
-    uint16_t val = ADSR_MAX_VALUE/(ms * ADSR_CLK);
-    adsr[0] = 	(adsr[0] & 0xFFFF0000) 	| (val & 0x0000FFFF);
-}
-
-#define set_sustain(x,a) 	x[1] = 	(x[1] & 0x0000FFFF) 	| ((a & 0x0000FFFF) << 16)
-
-void set_release(uint32_t * adsr, uint16_t ms){
-    uint16_t val = ADSR_MAX_VALUE/(ms * ADSR_CLK);
-    adsr[1] = 	(adsr[1] & 0xFFFF0000) 	| (val & 0x0000FFFF);
-}
-
-// #define set_attack(x,a) 	x[0] = 	(x[0] & 0x0000FFFF) 	| ((a & 0x0000FFFF) << 16)
-// #define set_decay(x,a) 		x[0] = 	(x[0] & 0xFFFF0000) 	| (a & 0x0000FFFF)
-// #define set_release(x,a) 	x[1] = 	(x[1] & 0xFFFF0000) 	| (a & 0x0000FFFF)
+void set_attack(uint32_t * adsr, uint16_t ms);
+void set_decay(uint32_t * adsr, uint16_t ms);
+void set_sustain(uint32_t * adsr, float level);
+void set_release(uint32_t * adsr, uint16_t ms);
 
 // Memory mapped ADC
 #define adc_1 (*(volatile uint32_t*)0x10010000)
@@ -177,6 +138,5 @@ void set_release(uint32_t * adsr, uint16_t ms){
 
 #define set_modulation_gain(a) 	    modulator1 = 	(modulator1 & 0x0000FFFF) 	| ((a & 0x0000FFFF) << 16)
 #define set_modulation_offset(a) 	modulator1 = 	(modulator1 & 0xFFFF0000) 	| (a & 0x0000FFFF)
-
 
 #endif  // _ROCKETFPGA_H
