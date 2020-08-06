@@ -197,12 +197,16 @@ float sqrt (float x){
 	return (y);
 }
 
-typedef int16_t fixed_point_t;
+typedef uint16_t fixed_point_t;
 #define FIXED_POINT_FRACTIONAL_BITS 14
 
 inline fixed_point_t float_to_fixed(float input)
 {
-    return (fixed_point_t)(input * (1 << FIXED_POINT_FRACTIONAL_BITS));
+	if (input >= 0){
+		return (fixed_point_t)(input * ((1 << FIXED_POINT_FRACTIONAL_BITS)-1));
+	}else{
+		return (fixed_point_t)(1 << FIXED_POINT_FRACTIONAL_BITS+1)+((2.0+input) * ((1 << FIXED_POINT_FRACTIONAL_BITS)));
+	}
 }
 
 void set_biquad(biquad_type type, float f, float peak_gain_lin, float Q) {

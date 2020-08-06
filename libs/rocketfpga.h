@@ -175,10 +175,10 @@ void set_biquad(biquad_type type, float f, float peak_gain_lin, float Q);
 #define set_biquad_b1(v) 	    biquad_reg_2 = 	(biquad_reg_2 & 0xFFFF0000) 	| (v & 0x0000FFFF)
 #define set_biquad_b2(v) 	    biquad_reg_3 = 	(biquad_reg_3 & 0x0000FFFF) 	| ((v & 0x0000FFFF) << 16)
 
-#define get_biquad_a0() 	    (biquad_reg_1 & 0x0000FFFF)
-#define get_biquad_a1() 	    (biquad_reg_1 & 0xFFFF0000) 	
-#define get_biquad_a2() 	    (biquad_reg_2 & 0x0000FFFF)
-#define get_biquad_b1() 	    (biquad_reg_2 & 0xFFFF0000) 	
-#define get_biquad_b2() 	    (biquad_reg_3 & 0x0000FFFF)
+#define get_biquad_a0() 	    (biquad_reg_1 & 0xFFFF0000) >> 16
+#define get_biquad_a1() 	    (biquad_reg_1 & 0x0000FFFF) 	
+#define get_biquad_a2() 	    (biquad_reg_2 & 0xFFFF0000) >> 16
+#define get_biquad_b1() 	    (biquad_reg_2 & 0x0000FFFF) 	
+#define get_biquad_b2() 	    (biquad_reg_3 & 0xFFFF0000) >> 16
 
 #endif  // _ROCKETFPGA_H

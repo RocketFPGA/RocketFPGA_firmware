@@ -20,7 +20,7 @@ void init_codec(){
 	set_codec_powerdown(OUTPD, 1);
 
 	set_codec_line_volume(30);
-	set_codec_headphone_volume(126);
+	set_codec_headphone_volume(124);
 
 	set_codec_analog_path(MICBOOST, 1);
 	set_codec_analog_path(MUTEMIC, 0);

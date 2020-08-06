@@ -21,13 +21,13 @@ void main(){
 	// timer = timer + bpm;
 	// irq_global_enable();
 
-	osc1 = phase_from_freq(600);
-	set_osc_type(OSC1_TYPE, 1);
+	osc1 = phase_from_freq(10000);
+	set_osc_type(OSC1_TYPE, SINE_TYPE);
 
 	set_matrix(MATRIX_OSC_1, MATRIX_BIQUAD_IN);
 	
 	set_matrix(MATRIX_OSC_1, MATRIX_OUTPUT_L);
-	set_matrix(MATRIX_OSC_1, MATRIX_OUTPUT_R);
+	set_matrix(MATRIX_BIQUAD_OUT, MATRIX_OUTPUT_R);
 
 	set_attack(adsr1, 50);
 	set_decay(adsr1, 40);
@@ -54,12 +54,14 @@ void main(){
 	// 	osc1 = phase_from_freq((freq_from_phase(osc1)+100)%23000);
 	// 	delay(2000);
 	// }
-	set_biquad(LOWPASS, 12000.0, 1.0, 1.0);
+
+
+	set_biquad(LOWSHELF, 3000.0, 5, 3);
+	
+
 	while (1){
-		// printf("%d %f\n",adc_1, 20000.0*(adc_1/3000.0));
-		
-		osc1 = phase_from_freq((freq_from_phase(osc1)+100)%10000);
-		delay(2000);
+		osc1 = phase_from_freq((freq_from_phase(osc1)+100)%24000);
+		delay(1000);
 
 		// printf("%d\n",timer);
 		// read_rocket_command();
