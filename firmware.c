@@ -17,18 +17,17 @@ void  isr_irq(void){
 }
 
 void main(){
-	irq_enable(7);
-	timer = timer + bpm;
-	irq_global_enable();
+	// irq_enable(7);
+	// timer = timer + bpm;
+	// irq_global_enable();
 
-	osc1 = phase_from_freq(500);
-	set_osc_type(OSC1_TYPE, 0);
+	osc1 = phase_from_freq(600);
+	set_osc_type(OSC1_TYPE, 1);
 
-	set_matrix(MATRIX_OSC_1, MATRIX_MULT_IN_1);
-	set_matrix(MATRIX_ENVELOPE_OUT, MATRIX_MULT_IN_2);
+	set_matrix(MATRIX_OSC_1, MATRIX_BIQUAD_IN);
 	
-	set_matrix(MATRIX_MULT_OUT, MATRIX_OUTPUT_R);
-	set_matrix(MATRIX_MULT_OUT, MATRIX_OUTPUT_L);
+	set_matrix(MATRIX_OSC_1, MATRIX_OUTPUT_L);
+	set_matrix(MATRIX_OSC_1, MATRIX_OUTPUT_R);
 
 	set_attack(adsr1, 50);
 	set_decay(adsr1, 40);
@@ -49,9 +48,20 @@ void main(){
 		
 	init_codec();
 
-	uint8_t i = 0;
+
+
+	// while(1){
+	// 	osc1 = phase_from_freq((freq_from_phase(osc1)+100)%23000);
+	// 	delay(2000);
+	// }
+	set_biquad(LOWPASS, 12000.0, 1.0, 1.0);
 	while (1){
-		// printf("%x\n",triggers);
+		// printf("%d %f\n",adc_1, 20000.0*(adc_1/3000.0));
+		
+		osc1 = phase_from_freq((freq_from_phase(osc1)+100)%10000);
+		delay(2000);
+
+		// printf("%d\n",timer);
 		// read_rocket_command();
 		// printf(">");
 	}

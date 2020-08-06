@@ -19,12 +19,12 @@ void init_codec(){
 	set_codec_powerdown_all(0);
 	set_codec_powerdown(OUTPD, 1);
 
-	set_codec_line_volume(0);
-	set_codec_headphone_volume(120);
+	set_codec_line_volume(30);
+	set_codec_headphone_volume(126);
 
 	set_codec_analog_path(MICBOOST, 1);
 	set_codec_analog_path(MUTEMIC, 0);
-	set_codec_mic_input();
+	set_codec_line_input();
 	set_codec_analog_path(BYPASS, 0);
 	set_codec_analog_path(DACSEL, 1);
 	set_codec_analog_path(SIDETONE, 0);
