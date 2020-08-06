@@ -7,7 +7,10 @@
 #define PHASE_SIZE  16  
 #define SAMPLING_FREQ  48000  
 
+// Utils
 #define POWTWO(EXP) (1 << (EXP))
+#define M_PI 3.14159265358979323846
+#define M_PI_2 1.57079632679489661923
 
 // Memory mapped GPIO
 #define gpio  (*(volatile uint32_t*) 0x02000000)
@@ -61,7 +64,7 @@ static uint32_t * oscs = 0x10000000;
 // Memory mapped matrix
 #define matrix_1 (*(volatile uint32_t*)0x10000018)
 #define matrix_2 (*(volatile uint32_t*)0x1000001C)
-#define MATRIX_IN 10
+#define MATRIX_IN 12
 #define MATRIX_OUT 12
 
 #define MATRIX_MIXER4_IN_1 1
@@ -75,6 +78,7 @@ static uint32_t * oscs = 0x10000000;
 #define MATRIX_OUTPUT_L    9
 #define MATRIX_MOD_IN_1    10
 #define MATRIX_MOD_IN_2    11
+#define MATRIX_BIQUAD_IN   12
 
 static const char *matrix_out_names[MATRIX_OUT+1] = {"", "MATRIX_MIXER4_IN_1",
                                           "MATRIX_MIXER4_IN_2",
@@ -86,7 +90,8 @@ static const char *matrix_out_names[MATRIX_OUT+1] = {"", "MATRIX_MIXER4_IN_1",
                                           "MATRIX_OUTPUT_R",
                                           "MATRIX_OUTPUT_L",
                                           "MATRIX_MOD_IN_1",
-                                          "MATRIX_MOD_IN_2"};
+                                          "MATRIX_MOD_IN_2",
+                                          "MATRIX_BIQUAD_IN"};
 
 #define MATRIX_NONE         0
 #define MATRIX_OSC_1        1
@@ -99,6 +104,7 @@ static const char *matrix_out_names[MATRIX_OUT+1] = {"", "MATRIX_MIXER4_IN_1",
 #define MATRIX_ENVELOPE_OUT 8
 #define MATRIX_MOD_OUT      9
 #define MATRIX_LINE_MIC     10
+#define MATRIX_BIQUAD_OUT   11
 
 static const char *matrix_in_names[MATRIX_IN] = {"MATRIX_NONE",
                                                     "MATRIX_OSC_1",
@@ -110,7 +116,8 @@ static const char *matrix_in_names[MATRIX_IN] = {"MATRIX_NONE",
                                                     "MATRIX_ECHO_OUT",
                                                     "MATRIX_ENVELOPE_OUT",
                                                     "MATRIX_MOD_OUT",
-                                                    "MATRIX_LINE_MIC"};
+                                                    "MATRIX_LINE_MIC",
+                                                    "MATRIX_BIQUAD_OUT"};
 
 
 
@@ -138,5 +145,40 @@ void set_release(uint32_t * adsr, uint16_t ms);
 
 #define set_modulation_gain(a) 	    modulator1 = 	(modulator1 & 0x0000FFFF) 	| ((a & 0x0000FFFF) << 16)
 #define set_modulation_offset(a) 	modulator1 = 	(modulator1 & 0xFFFF0000) 	| (a & 0x0000FFFF)
+
+// Memory mapped modulator
+#define modulator1 (*(volatile uint32_t*)0x1000002C)
+
+#define set_modulation_gain(a) 	    modulator1 = 	(modulator1 & 0x0000FFFF) 	| ((a & 0x0000FFFF) << 16)
+#define set_modulation_offset(a) 	modulator1 = 	(modulator1 & 0xFFFF0000) 	| (a & 0x0000FFFF)
+
+// Memory mapped biquad filter
+#define biquad_reg_1 (*(volatile uint32_t*)0x10000030)
+#define biquad_reg_2 (*(volatile uint32_t*)0x10000034)
+#define biquad_reg_3 (*(volatile uint32_t*)0x10000038)
+
+typedef enum {
+	LOWPASS,
+	HIGHPASS,
+	BANDPASS,
+	NOTCH,
+	PEAK,
+    LOWSHELF,
+    HIGHSHELF
+} biquad_type ; 
+
+void set_biquad(biquad_type type, float f, float peak_gain_lin, float Q);
+
+#define set_biquad_a0(v) 	    biquad_reg_1 = 	(biquad_reg_1 & 0x0000FFFF) 	| ((v & 0x0000FFFF) << 16)
+#define set_biquad_a1(v) 	    biquad_reg_1 = 	(biquad_reg_1 & 0xFFFF0000) 	| (v & 0x0000FFFF)
+#define set_biquad_a2(v) 	    biquad_reg_2 = 	(biquad_reg_2 & 0x0000FFFF) 	| ((v & 0x0000FFFF) << 16)
+#define set_biquad_b1(v) 	    biquad_reg_2 = 	(biquad_reg_2 & 0xFFFF0000) 	| (v & 0x0000FFFF)
+#define set_biquad_b2(v) 	    biquad_reg_3 = 	(biquad_reg_3 & 0x0000FFFF) 	| ((v & 0x0000FFFF) << 16)
+
+#define get_biquad_a0() 	    (biquad_reg_1 & 0xFFFF0000) >> 16
+#define get_biquad_a1() 	    (biquad_reg_1 & 0x0000FFFF) 	
+#define get_biquad_a2() 	    (biquad_reg_2 & 0xFFFF0000) >> 16
+#define get_biquad_b1() 	    (biquad_reg_2 & 0x0000FFFF) 	
+#define get_biquad_b2() 	    (biquad_reg_3 & 0xFFFF0000) >> 16
 
 #endif  // _ROCKETFPGA_H
