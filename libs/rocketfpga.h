@@ -45,6 +45,18 @@ static uint32_t * oscs = 0x10000000;
 
 // Memory mapped echo
 #define echo_delay (*(volatile uint32_t*)0x10000014)
+#define echo_coefs (*(volatile uint32_t*)0x10000014)
+
+#define ECHO_DELAY_ADDRESS_LEN 14
+#define MAX_ECHO_DELAY_SAMPLES POWTWO(ECHO_DELAY_ADDRESS_LEN)-1
+#define ECHO_DELAY_PER_SAMPLE_MS 1000/SAMPLING_FREQ
+#define MAX_ECHO_DELAY_MS MAX_ECHO_DELAY_SAMPLES*ECHO_DELAY_PER_SAMPLE_MS
+
+#define set_echo_delay(v) 	            echo_delay = v * ECHO_DELAY_PER_SAMPLE_MS
+#define set_echo_delay(v)    	        if(v <= MAX_ECHO_DELAY_MS){echo_delay = v * ECHO_DELAY_PER_SAMPLE_MS;}else{echo_delay = MAX_ECHO_DELAY_SAMPLES;};
+
+#define set_echo_input_gain(v) 	        echo_coefs = (echo_coefs & 0x0000FFFF) 	| ((v & 0x0000FFFF) << 16)
+#define set_echo_feedback_gain(v) 	    echo_coefs = (echo_coefs & 0xFFFF0000) 	| (v & 0x0000FFFF)
 
 // Memory mapped triggers and enablers
 #define triggers (*(volatile uint32_t*)0x10000010)
