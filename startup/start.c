@@ -11,6 +11,33 @@ extern uint32_t  _start_heap;
 extern uint32_t  _global_pointer;
 extern void (* const IV[])(void);
 
+// IRQ Handling
+void irq_enable(unsigned int irq)
+{
+	uint32_t mie;
+	__asm__ volatile ("csrrs %0, mie, %1\n" : "=r" (mie) : "r" (1 << irq));
+}
+
+uint32_t irq_is_enabled(unsigned int irq)
+{
+	uint32_t mie;
+	__asm__ volatile ("csrr %0, mie" : "=r" (mie));
+	return !!(mie & (1 << irq));
+}
+
+void irq_global_disable(void)
+{	
+	uint32_t mstatus;
+	__asm__ volatile ("csrrc %0, mstatus, %1\n" : "=r" (mstatus) : "r" (1 << 3) );
+}
+
+void irq_global_enable(void)
+{	
+	uint32_t mstatus;
+	__asm__ volatile ("csrrs %0, mstatus, %1\n" : "=r" (mstatus) : "r" (1 << 3));
+}
+
+
 extern void main(void);
 void __attribute__((section(".init"),naked)) _reset(void) {
     register uint32_t *src, *dst;
@@ -35,6 +62,10 @@ void __attribute__((section(".init"),naked)) _reset(void) {
         *dst = 0U;
         dst++;
     }
+
+    // Enable global interrupts
+    irq_enable(7);
+	irq_global_enable();
 
     /* Run the program! */
     main();

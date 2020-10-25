@@ -27,34 +27,6 @@ void delay(uint32_t d){
 	}
 }
 
-// IRQ 
-void irq_enable(unsigned int irq)
-{
-	uint32_t mie;
-	__asm__ volatile ("csrrs %0, mie, %1\n" : "=r" (mie) : "r" (1 << irq));
-}
-
-uint32_t irq_is_enabled(unsigned int irq)
-{
-	uint32_t mie;
-	__asm__ volatile ("csrr %0, mie" : "=r" (mie));
-	return !!(mie & (1 << irq));
-}
-
-void irq_global_disable(void)
-{	
-	uint32_t mstatus;
-	__asm__ volatile ("csrrc %0, mstatus, %1" : "=r" (mstatus) : "r" (1 << 3) : "memory");
-	__asm__ volatile ("csrwi mie, 0\n"
-			          "csrwi mip, 0\n");
-}
-
-void irq_global_enable(void)
-{	
-	uint32_t mstatus;
-	__asm__ volatile ("csrrs %0, mstatus, %1\n" : "=r" (mstatus) : "r" (1 << 3));
-}
-
 // ADSR
 
 void set_attack(uint32_t * adsr, uint16_t ms){

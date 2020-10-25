@@ -1,9 +1,10 @@
 #ifndef _ROCKETFPGA_H
 #define _ROCKETFPGA_H
 
+#include "timer.h"
+
 // Global configuration
 #define MEM_LEN  32768  // 32 kB
-#define CLK_HZ  12000000  // 12 MHz
 #define PHASE_SIZE  16  
 #define SAMPLING_FREQ  48000  
 
@@ -19,9 +20,6 @@
 
 // Memory mapped UART
 #define reg_uart_data (*(volatile uint32_t*)0x04000000)
-
-// Memory mapped timer
-#define timer (*(volatile uint32_t*)0x08000000)
 
 // Memory mapped oscillators
 static uint32_t * oscs = 0x10000000;
