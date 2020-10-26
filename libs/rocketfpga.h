@@ -14,7 +14,7 @@
 #define M_PI_2 1.57079632679489661923
 
 // Memory mapped GPIO
-#define gpio  (*(volatile uint32_t*) 0x02000000)
+#define gpio  (*(volatile uint32_t*) 0x05000000)
 #define GPIO_LED  	 0x1
 #define GPIO_BUTTON  0x2
 
