@@ -36,6 +36,7 @@ SECTIONS
         _global_pointer = . + 0x800;
         *(.sdata*)
         . = ALIGN(4);
+         *(.ramfunctions)
         _end_data = .;
     } > RAM
 

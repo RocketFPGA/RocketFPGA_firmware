@@ -3,6 +3,8 @@
 
 #include "timer.h"
 
+#define RAMFUNC __attribute__ ((section (".ramfunctions")))
+
 // Global configuration
 #define MEM_LEN  32768  // 32 kB
 #define PHASE_SIZE  16  

@@ -131,8 +131,9 @@ void __attribute__((section(".init"),naked)) _reset(void) {
 	irq_global_enable();
 
     // Set high speed SPI mode
-    set_flash_qspi_flag();
-	set_flash_mode_qddr();
+    // set_flash_mode_dual();
+    // set_flash_qspi_flag();
+	// set_flash_mode_qddr();
 	// enable_flash_crm(); // Not stablecy check in hw v2
 
     /* Run the program! */
