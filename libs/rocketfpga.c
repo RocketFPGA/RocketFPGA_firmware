@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include "rocketfpga.h"
+#include <rocketfpga.h>
 
 uint32_t phase_from_freq(uint32_t freq){
 	return freq * POWTWO(PHASE_SIZE) / SAMPLING_FREQ;  
@@ -10,15 +10,14 @@ uint32_t freq_from_phase(uint32_t phase){
 }
 
 char getchar(){
-	int32_t c = -1;
-	while (c == -1) {
-		c = reg_uart_data;
+	char c;
+	while (!read_console_char(&c)){
 	}
 	return c;
 }
 
 void _putchar(char c){
-	reg_uart_data = c;
+	reg_console_uart = c;
 }
 
 void delay(uint32_t d){

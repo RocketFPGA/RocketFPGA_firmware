@@ -13,47 +13,47 @@ typedef enum {
 	ERROR,
 } cmd_type ; 
 
-typedef struct err_cmd {
+typedef struct err_cmd_t {
 	char * error;
-} err_cmd;
+} err_cmd_t;
 
-typedef struct osc_cmd {
+typedef struct osc_cmd_t {
 	uint8_t index;
 	uint8_t type;
 	uint32_t freq;
-} osc_cmd;
+} osc_cmd_t;
 
-typedef struct adsr_cmd {
+typedef struct adsr_cmd_t {
 	uint8_t index;
 	uint8_t attack;
 	uint8_t decay;
 	uint8_t sustain;
 	uint8_t release;
-} adsr_cmd;
+} adsr_cmd_t;
 
-typedef struct echo_cmd {
+typedef struct echo_cmd_t {
 	uint8_t index;
 	uint8_t feedback;
 	uint16_t delay;
-} echo_cmd;
+} echo_cmd_t;
 
-typedef struct matrix_cmd {
+typedef struct matrix_cmd_t {
 	uint8_t in;
 	uint8_t out;
-} matrix_cmd;
+} matrix_cmd_t;
 
-typedef struct rocket_cmd {
+typedef struct rocket_cmd_t {
 	cmd_type type;
 	union {
-		osc_cmd osc;
-		adsr_cmd adrs;
-		echo_cmd echo;
-		matrix_cmd matrix;
-		err_cmd error;
+		osc_cmd_t osc;
+		adsr_cmd_t adrs;
+		echo_cmd_t echo;
+		matrix_cmd_t matrix;
+		err_cmd_t error;
 	};
-} rocket_cmd;
+} rocket_cmd_t;
 
-void parse_command(rocket_cmd * cmd);
+void parse_command(rocket_cmd_t * cmd);
 
 void read_rocket_command(){
 	uint16_t index = 0;
@@ -62,7 +62,7 @@ void read_rocket_command(){
 		_putchar(protocol_buffer[index-1]);
 	} while (protocol_buffer[index-1] != '\n');
 
-	rocket_cmd cmd;
+	rocket_cmd_t cmd;
 	parse_command(&cmd);
 	
 	switch (cmd.type){
@@ -124,7 +124,7 @@ uint16_t parse_uint16(char s[], uint8_t len){
 	return res;
 }
 
-void parse_command(rocket_cmd * cmd){
+void parse_command(rocket_cmd_t * cmd){
 	if (check_cmd_header("OSC")){
 		cmd->type = OSC;
 		cmd->osc.index 	= parse_uint16(&protocol_buffer[3], 1);

@@ -1,7 +1,11 @@
 #ifndef _ROCKETFPGA_H
 #define _ROCKETFPGA_H
 
-#include "timer.h"
+#include <timer.h>
+#include <uart.h>
+#include <rocketfpga_codec.h>
+#include <isr.h>
+
 
 #define RAMFUNC __attribute__ ((section (".ramfunctions")))
 
@@ -19,9 +23,6 @@
 #define gpio  (*(volatile uint32_t*) 0x05000000)
 #define GPIO_LED  	 0x1
 #define GPIO_BUTTON  0x2
-
-// Memory mapped UART
-#define reg_uart_data (*(volatile uint32_t*)0x04000000)
 
 // Memory mapped oscillators
 static uint32_t * oscs = 0x10000000;

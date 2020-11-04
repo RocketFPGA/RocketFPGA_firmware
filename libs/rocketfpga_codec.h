@@ -1,6 +1,7 @@
 #ifndef _ROCKETFPGA_CODEC_H
 #define _ROCKETFPGA_CODEC_H
 
+#include <stdbool.h>
 
 #define codec (*(volatile uint32_t*) 0x03000000)
 

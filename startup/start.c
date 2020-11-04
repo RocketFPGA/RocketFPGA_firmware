@@ -137,5 +137,6 @@ void __attribute__((section(".init"),naked)) _reset(void) {
 	// enable_flash_crm(); // Not stablecy check in hw v2
 
     /* Run the program! */
+	init_uart();
     main();
 }

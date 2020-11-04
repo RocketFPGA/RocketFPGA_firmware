@@ -4,6 +4,7 @@
 #define ISR_SOURCES \
 	X(TIMER0) 		\
 	X(TIMER1) 		\
+	X(UART0) 		\
 	X(BUTTON1) 		\
 
 typedef void (*isr_handler)(void *);
@@ -16,12 +17,12 @@ enum
     NUM_ISR_SOURCES
 };
 
-typedef struct isr_struct {
+typedef struct isr_struct_t {
     isr_handler callback;
     void * args;
-} isr_struct;
+} isr_struct_t;
 
-extern isr_struct isr_struct_array[NUM_ISR_SOURCES];
+extern isr_struct_t isr_struct_array[NUM_ISR_SOURCES];
 
 #define irq_vector (*(volatile uint32_t*) 0x09000000)
 #define irq_vector_mask (*(volatile uint32_t*) 0x09000004)

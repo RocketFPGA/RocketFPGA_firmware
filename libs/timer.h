@@ -18,15 +18,15 @@ typedef void (*timer_beat_callback)();
 	X(0, 0x08000000)    \
 	X(1, 0x08000004)    \
 
-enum
+typedef enum timer_t
 {
 #define X(a,b) TIMER ## a,
     TIMERS
 #undef X
     NUM_TIMERS
-};
+} timer_t;
 
-typedef struct timer{
+typedef struct timer_data_t{
     volatile uint32_t* addr;
     timer_beat_callback callback;
     union
@@ -34,15 +34,15 @@ typedef struct timer{
         uint32_t beat;
         uint32_t timer;
     };
-} timer;
+} timer_data_t;
 
-extern volatile timer timers[NUM_TIMERS];
+extern volatile timer_data_t timers[NUM_TIMERS];
 
-void set_timer_to(size_t timer, uint32_t val);
+void set_timer_to(timer_t timer, uint32_t val);
 
-void set_timer_beat(size_t timer, uint32_t beat, timer_beat_callback callback);
+void set_timer_beat(timer_t timer, uint32_t beat, timer_beat_callback callback);
 #define clear_timer_beat unset_isr_callback
-void set_timer_timeout(size_t timer, uint32_t ms, timer_beat_callback callback);
+void set_timer_timeout(timer_t timer, uint32_t ms, timer_beat_callback callback);
 #define clear_timer_timeout unset_isr_callback
 
 #endif  // _TIMER_H

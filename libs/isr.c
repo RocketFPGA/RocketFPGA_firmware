@@ -3,7 +3,7 @@
 
 #include "isr.h"
 
-isr_struct isr_struct_array[NUM_ISR_SOURCES] = {0};
+isr_struct_t isr_struct_array[NUM_ISR_SOURCES] = {0};
 
 
 // Here the callback != NULL can be deleted if we suppose that a unmasked IRQ is always registed
