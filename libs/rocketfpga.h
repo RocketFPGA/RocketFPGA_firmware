@@ -3,7 +3,6 @@
 
 #include <timer.h>
 #include <uart.h>
-#include <rocketfpga_codec.h>
 #include <isr.h>
 
 
@@ -46,6 +45,10 @@ static uint32_t * oscs = 0x10000000;
 
 // Memory mapped echo
 #define echo_delay (*(volatile uint32_t*)0x10000014)
+#define echo_gains (*(volatile uint32_t*)0x1000003C)
+
+#define set_echo_drygain(a) 	    echo_gains = 	(echo_gains & 0x0000FFFF) 	| ((a & 0x0000FFFF) << 16)
+#define set_echo_wetgain(a) 	    echo_gains = 	(echo_gains & 0xFFFF0000) 	| (a & 0x0000FFFF)
 
 // Memory mapped triggers and enablers
 #define triggers (*(volatile uint32_t*)0x10000010)
@@ -77,8 +80,8 @@ static uint32_t * oscs = 0x10000000;
 #define MATRIX_ECHO_IN     7
 #define MATRIX_OUTPUT_R    8
 #define MATRIX_OUTPUT_L    9
-#define MATRIX_MOD_IN_1    10
-#define MATRIX_MOD_IN_2    11
+#define MATRIX_MOD_IN_CARR 10
+#define MATRIX_MOD_IN_MOD  11
 #define MATRIX_BIQUAD_IN   12
 
 static const char *matrix_out_names[MATRIX_OUT+1] = {"", "MATRIX_MIXER4_IN_1",
@@ -137,15 +140,6 @@ void set_attack(uint32_t * adsr, uint16_t ms);
 void set_decay(uint32_t * adsr, uint16_t ms);
 void set_sustain(uint32_t * adsr, float level);
 void set_release(uint32_t * adsr, uint16_t ms);
-
-// Memory mapped ADC
-#define adc_1 (*(volatile uint32_t*)0x10010000)
-
-// Memory mapped modulator
-#define modulator1 (*(volatile uint32_t*)0x1000002C)
-
-#define set_modulation_gain(a) 	    modulator1 = 	(modulator1 & 0x0000FFFF) 	| ((a & 0x0000FFFF) << 16)
-#define set_modulation_offset(a) 	modulator1 = 	(modulator1 & 0xFFFF0000) 	| (a & 0x0000FFFF)
 
 // Memory mapped modulator
 #define modulator1 (*(volatile uint32_t*)0x1000002C)

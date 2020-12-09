@@ -23,7 +23,7 @@ void timers_beat_callback(void * args){
 void set_timer_beat(timer_t timer, uint32_t beat, timer_beat_callback callback){
 	timers[timer].beat = beat;
 	timers[timer].callback = callback;
-	*(timers[timer].addr) += *(timers[timer].addr);  // Start the beat right now
+	*(timers[timer].addr) = *(timers[timer].addr);  // Start the beat right now
 	set_isr_callback_with_args(timer, timers_beat_callback, (void*) &timers[timer]);
 }
 

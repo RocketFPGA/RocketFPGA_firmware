@@ -45,4 +45,6 @@ void set_timer_beat(timer_t timer, uint32_t beat, timer_beat_callback callback);
 void set_timer_timeout(timer_t timer, uint32_t ms, timer_beat_callback callback);
 #define clear_timer_timeout unset_isr_callback
 
+#define get_timer(timer) *(timers[timer].addr)
+
 #endif  // _TIMER_H
