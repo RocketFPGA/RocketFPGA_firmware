@@ -1,12 +1,9 @@
 #ifndef _ROCKETFPGA_H
 #define _ROCKETFPGA_H
 
-#include <timer.h>
-#include <uart.h>
-#include <isr.h>
+#define SHIELD_POTS
 
-
-#define RAMFUNC __attribute__ ((section (".ramfunctions")))
+#include <printf.h>
 
 // Global configuration
 #define MEM_LEN  32768  // 32 kB
@@ -18,30 +15,16 @@
 #define M_PI 3.14159265358979323846
 #define M_PI_2 1.57079632679489661923
 
-// Memory mapped GPIO
-#define gpio  (*(volatile uint32_t*) 0x05000000)
-#define GPIO_LED  	 0x1
-#define GPIO_BUTTON  0x2
+#include <timer.h>
+#include <uart.h>
+#include <isr.h>
+#include <oscillators.h>
+#include <gpio.h>
 
-// Memory mapped oscillators
-static uint32_t * oscs = 0x10000000;
-#define osc1 (*(volatile uint32_t*)0x10000000)
-#define osc2 (*(volatile uint32_t*)0x10000004)
-#define osc3 (*(volatile uint32_t*)0x10000008)
-#define osc4 (*(volatile uint32_t*)0x1000000C)
-
-#define osc_type (*(volatile uint32_t*)0x10000028)
-#define OSC1_TYPE 30
-#define OSC2_TYPE 28
-#define OSC3_TYPE 26
-#define OSC4_TYPE 24
-
-#define SINE_TYPE 0
-#define RAMP_TYPE 1
-#define SQUARE_TYPE 2
-#define TRIANGLE_TYPE 3
-
-#define set_osc_type(x,a) 	osc_type = 	(osc_type & ~(0x3 << x)) | ((a & 0x3) << x)
+#ifdef SHIELD_POTS
+#include <charlieplexed_leds.h>
+#include <adc128S102.h>
+#endif
 
 // Memory mapped echo
 #define echo_delay (*(volatile uint32_t*)0x10000014)
@@ -175,5 +158,23 @@ void set_biquad(biquad_type type, float f, float peak_gain_lin, float Q);
 #define get_biquad_a2() 	    (biquad_reg_2 & 0xFFFF0000) >> 16
 #define get_biquad_b1() 	    (biquad_reg_2 & 0x0000FFFF) 	
 #define get_biquad_b2() 	    (biquad_reg_3 & 0xFFFF0000) >> 16
+
+
+// Miscelanea 
+
+#define RAMFUNC __attribute__ ((section (".ramfunctions")))
+
+static void print_header(){
+    printf("\n");
+	printf("  _____            _        _   ______ _____   _____          \n");
+	printf(" |  __ \\          | |      | | |  ____|  __ \\ / ____|   /\\    \n");
+	printf(" | |__) |___   ___| | _____| |_| |__  | |__) | |  __   /  \\   \n");
+	printf(" |  _  // _ \\ / __| |/ / _ \\ __|  __| |  ___/| | |_ | / /\\ \\  \n");
+	printf(" | | \\ \\ (_) | (__|   <  __/ |_| |    | |    | |__| |/ ____ \\ \n");
+	printf(" |_|  \\_\\___/ \\___|_|\\_\\___|\\__|_|    |_|     \\_____/_/    \\_\\\n");
+	printf("\n");
+	printf(" The Hardcore Audio Processor\n");
+	printf("\n");
+}
 
 #endif  // _ROCKETFPGA_H

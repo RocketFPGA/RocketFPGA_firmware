@@ -1,13 +1,7 @@
 #include <stdint.h>
 #include <rocketfpga.h>
 
-uint32_t phase_from_freq(uint32_t freq){
-	return freq * POWTWO(PHASE_SIZE) / SAMPLING_FREQ;  
-}
 
-uint32_t freq_from_phase(uint32_t phase){
-	return phase *  SAMPLING_FREQ / POWTWO(PHASE_SIZE);
-}
 
 char getchar(){
 	char c;
