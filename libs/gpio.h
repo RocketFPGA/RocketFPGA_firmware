@@ -7,7 +7,7 @@
 
 // Memory mapped GPIO
 #define gpio  (*(volatile uint32_t*) 0x05000000)
-#define GPIO_LED  	 0x1
+#define ONBOARD_LED  	 0x0
 
 #ifdef SHIELD_POTS
 #define BUTTON_1  	 0x1

@@ -311,5 +311,4 @@ void set_biquad(biquad_type type, float f, float peak_gain_lin, float Q) {
 	set_biquad_a2(float_to_fixed(a2));
 	set_biquad_b1(float_to_fixed(b1));
 	set_biquad_b2(float_to_fixed(b2));
-    return;
 }

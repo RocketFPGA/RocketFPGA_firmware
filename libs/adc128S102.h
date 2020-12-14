@@ -10,4 +10,10 @@
 #define adc_5    (*(volatile uint32_t*) 0x0B000010)
 #define adc_6    (*(volatile uint32_t*) 0x0B000014)
 
+
+static uint32_t map_adc(uint32_t value, uint32_t min, uint32_t max){
+    uint32_t range = max - min;
+    return min + range*((float) value / 4096.0);
+}
+
 #endif  // _ADC128S102_H

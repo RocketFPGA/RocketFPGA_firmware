@@ -11,6 +11,7 @@
 #define SAMPLING_FREQ  48000  
 
 // Utils
+#define rand() (*(volatile uint32_t*)0x06000000)
 #define POWTWO(EXP) (1 << (EXP))
 #define M_PI 3.14159265358979323846
 #define M_PI_2 1.57079632679489661923
@@ -52,14 +53,14 @@
 #define matrix_1 (*(volatile uint32_t*)0x10000018)
 #define matrix_2 (*(volatile uint32_t*)0x1000001C)
 #define MATRIX_IN 12
-#define MATRIX_OUT 12
+#define MATRIX_OUT 13
 
 #define MATRIX_MIXER4_IN_1 1
 #define MATRIX_MIXER4_IN_2 2
 #define MATRIX_MIXER4_IN_3 3
 #define MATRIX_MIXER4_IN_4 4
-#define MATRIX_MULT_IN_1   5
-#define MATRIX_MULT_IN_2   6
+#define MATRIX_ADSR_IN     5
+// #define MATRIX_MULT_IN_2   6
 #define MATRIX_ECHO_IN     7
 #define MATRIX_OUTPUT_R    8
 #define MATRIX_OUTPUT_L    9
@@ -86,12 +87,14 @@ static const char *matrix_out_names[MATRIX_OUT+1] = {"", "MATRIX_MIXER4_IN_1",
 #define MATRIX_OSC_3        3
 #define MATRIX_OSC_4        4
 #define MATRIX_MIXER4_OUT   5
-#define MATRIX_MULT_OUT     6
+#define MATRIX_ADSR_OUT     6
 #define MATRIX_ECHO_OUT     7
 #define MATRIX_ENVELOPE_OUT 8
 #define MATRIX_MOD_OUT      9
+#define MATRIX_LINE_L       10
 #define MATRIX_LINE_MIC     10
-#define MATRIX_BIQUAD_OUT   11
+#define MATRIX_LINE_R       11
+#define MATRIX_BIQUAD_OUT   12
 
 static const char *matrix_in_names[MATRIX_IN] = {"MATRIX_NONE",
                                                     "MATRIX_OSC_1",
@@ -112,6 +115,15 @@ static const char *matrix_in_names[MATRIX_IN] = {"MATRIX_NONE",
 #define set_matrix_2(in, out) 	 matrix_2 = ((matrix_2 & ~(0xF << (4*(out-1)))) | ((in & 0xF) << (4*(out-1))))
 #define set_matrix(in, out) 	 if(out <= 8){set_matrix_1(in, out);}else{set_matrix_2(in, out-8);};
 
+static uint64_t save_matrix(){
+    return ((uint64_t) matrix_1 << 32) | matrix_2;
+}
+
+static void load_matrix(uint64_t saving){
+    matrix_1 = (uint32_t) (saving >> 32);
+    matrix_2 = (uint32_t) (saving & 0xFFFFFFFF);
+}
+
 // Memory mapped ADSR: assumes release and decay from max value
 static uint32_t * adsr1 = 0x10000020;
 
@@ -121,7 +133,7 @@ static uint32_t * adsr1 = 0x10000020;
 
 void set_attack(uint32_t * adsr, uint16_t ms);
 void set_decay(uint32_t * adsr, uint16_t ms);
-void set_sustain(uint32_t * adsr, float level);
+void set_sustain(uint32_t * adsr, uint16_t level);
 void set_release(uint32_t * adsr, uint16_t ms);
 
 // Memory mapped modulator

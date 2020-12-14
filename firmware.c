@@ -4,15 +4,61 @@
 #include <printf.h>
 #include <rocketfpga.h>
 
+
+void trigger_adsr(){
+	enable_trigger(ADRS_TRIGGER);
+	enable_gpio(ONBOARD_LED);
+	while (get_gpio(BUTTON_1)){}
+	disable_trigger(ADRS_TRIGGER);
+	disable_gpio(ONBOARD_LED);
+}
+
+
 void enable_echo(){
 	toogle_charlie_led(3);
-	toogle_charlie_led(2);
-	echo_delay = adc_3*8;
+	echo_delay = adc_3<<2;;
 	toogle_trigger(ECHO_ENABLE);
 }
 
+void toogle_input(){
+	uint64_t m = save_matrix();
+	set_matrix(MATRIX_LINE_L, MATRIX_OUTPUT_L);
+	set_matrix(MATRIX_LINE_R, MATRIX_OUTPUT_R);
+	enable_charlie_led(0);
+	while (get_gpio(BUTTON_1)){}
+	disable_charlie_led(0);
+	load_matrix(m);
+}
+
+void toogle_filter(){
+	uint64_t m = save_matrix();
+	float freq = (float) map_adc(adc_6, 100, 10000);
+	printf("%f\n", freq);
+	set_biquad(LOWPASS, freq, 1.0, 10.0);
+	set_matrix(MATRIX_BIQUAD_OUT, MATRIX_OUTPUT_L);
+	set_matrix(MATRIX_BIQUAD_OUT, MATRIX_OUTPUT_R);
+	enable_charlie_led(1);
+	while (get_gpio(BUTTON_2)){}
+	disable_charlie_led(1);
+	load_matrix(m);
+}
+
+void only_effects(){
+	uint64_t m = save_matrix();
+	float freq = (float) map_adc(adc_6, 100, 19000);
+	printf("%f\n", freq);
+	set_biquad(LOWPASS, freq, 0.7, 0.5);
+	set_matrix(MATRIX_BIQUAD_OUT, MATRIX_OUTPUT_R);
+	set_matrix(MATRIX_ECHO_OUT, MATRIX_OUTPUT_L);
+	enable_charlie_led(2);
+	while (get_gpio(BUTTON_3)){}
+	disable_charlie_led(2);
+	load_matrix(m);
+}
+
+
 void callback_set_echo(){
-	echo_delay = adc_3*8;
+	echo_delay = adc_3<<2;
 }
 
 void type_callback(){
@@ -31,29 +77,32 @@ void type_callback(){
 }
 
 void beat_cb(){
-	osc1 = phase_from_freq(50+adc_1/8);
+	static bool activate = true;
+	
+	if(activate){
+		chord_t c = generate_major_chord(NOTE_E, 4, rand()%3);
+		// switch (rand()%4)
+		// {
+		// 	case 0: c= generate_major_chord(rand()%12, 3+ rand()%2, CHORD_FIRST_INVERSION); break;
+		// 	case 1: c= generate_min7_chord(rand()%12, 3+ rand()%2, CHORD_FIRST_INVERSION); break;
+		// 	case 2: c= generate_minor_chord(rand()%12, 3+ rand()%2, CHORD_FIRST_INVERSION); break;
+		// 	case 3: c= generate_dominant7_chord(rand()%12, 3+ rand()%2, CHORD_FIRST_INVERSION); break;
+		// }
+
+		osc_1 =  c.notes[0];
+		osc_2 =  c.notes[1];
+		osc_3 =  c.notes[2];
+		if (c.len == 4){
+			osc_4 =  c.notes[3];
+		} else {
+			osc_4 = 0;
+		}
+	}
+
+	activate = !activate;
 
 	toogle_trigger(ADRS_TRIGGER);
-	gpio = ~gpio;
-	toogle_charlie_led(11);
-}
-
-void manual_trigger(){
-	echo_delay = adc_3<<2;
-	osc2 = phase_from_freq(adc_2/8);
-
-	enable_trigger(ADRS_TRIGGER);
-	set_osc_type(OSC1_TYPE, SQUARE_TYPE);
-
-	while (get_gpio(BUTTON_2))
-	{	
-		osc1 = phase_from_freq(50+adc_1);
-		// 	osc1--;
-		// if 
-	}
-	set_osc_type(OSC1_TYPE, SINE_TYPE);
-
-	disable_trigger(ADRS_TRIGGER);
+	toogle_gpio(ONBOARD_LED);
 }
 
 
@@ -65,40 +114,53 @@ void main(){
 	set_osc_type(OSC3_TYPE, SINE_TYPE);
 	set_osc_type(OSC4_TYPE, SINE_TYPE);
 
-	set_matrix(MATRIX_OSC_2, MATRIX_MOD_IN_CARR)
-	set_matrix(MATRIX_OSC_1, MATRIX_MOD_IN_MOD)
-	set_matrix(MATRIX_OSC_1, MATRIX_MULT_IN_1);
-	set_matrix(MATRIX_ENVELOPE_OUT, MATRIX_MULT_IN_2);
-	set_matrix(MATRIX_MULT_OUT, MATRIX_ECHO_IN);
-	set_matrix(MATRIX_ECHO_OUT, MATRIX_OUTPUT_L);
-	set_matrix(MATRIX_MULT_OUT, MATRIX_OUTPUT_R);
+	set_matrix(MATRIX_OSC_1, MATRIX_MIXER4_IN_1);
+	set_matrix(MATRIX_OSC_2, MATRIX_MIXER4_IN_2);
+	// set_matrix(MATRIX_OSC_3, MATRIX_MIXER4_IN_3);
+	// set_matrix(MATRIX_OSC_4, MATRIX_MIXER4_IN_4);
 
-	set_all_charlie_leds(0);
-	charlie_leds_sequence_1();
+	set_matrix(MATRIX_ADSR_OUT, MATRIX_ECHO_IN);
+	set_matrix(MATRIX_MIXER4_OUT, MATRIX_ADSR_IN);
+
+	set_matrix(MATRIX_ECHO_OUT, MATRIX_OUTPUT_R);
+	set_matrix(MATRIX_ADSR_OUT, MATRIX_OUTPUT_L);
+
+	// charlie_leds_sequence_1();
+	// set_all_charlie_leds(1);
 
 	init_codec();
 
-	set_attack(adsr1, 50);
-	set_decay(adsr1, 10);
-	set_sustain(adsr1, 0.2);
-	set_release(adsr1, 200);
-
 	set_isr_callback_with_debounce(BUTTON4_ISR, enable_echo, MS(200));
 	set_timer_beat(TIMER1, BPM(240), beat_cb);
-	set_isr_callback(BUTTON2_ISR, manual_trigger);
-	set_isr_callback_with_debounce(BUTTON3_ISR, callback_set_echo, MS(200));
-	set_isr_callback_with_debounce(BUTTON1_ISR, type_callback, MS(200));
+	// set_isr_callback_with_debounce(BUTTON2_ISR, beat_cb, MS(200));
+	// set_isr_callback_with_debounce(BUTTON3_ISR, callback_set_echo, MS(200));
+	// set_isr_callback_with_debounce(BUTTON3_ISR, only_effects, MS(200));
+	// set_isr_callback_with_debounce(BUTTON2_ISR, toogle_filter, MS(200));
+	// set_isr_callback_with_debounce(BUTTON1_ISR, toogle_input, MS(200));
 
-	type_callback();
+    set_isr_callback_with_debounce(BUTTON1_ISR, trigger_adsr, MS(50));
+	
+	set_attack(adsr1, 256);
+	set_release(adsr1, 256);
+	set_decay(adsr1, 512);
+	set_sustain(adsr1, 0x7FFF);
 
 	while(1){
-		uint32_t aux = 10+adc_2>>1;
-		timers[TIMER1].beat = BPM(aux);
-		set_echo_drygain(adc_4<<3);
-		set_echo_wetgain(adc_5<<3);
-		printf("%08X\n",echo_gains);
+		// set_codec_line_volume(map_adc(adc_1, 0, 31));
+		// float freq = (float) map_adc(adc_6, 100, 19000);
+		// printf("%f\n", freq);
+		timers[TIMER1].beat = BPM(map_adc(adc_3, 120, 2000));
+	    // osc_1 = map_adc(adc_1,50,1000);
 
-		set_release(adsr1, adc_6+20);
+		// uint16_t att = map_adc(adc_5, 1, 512);
+		// uint16_t rel = map_adc(adc_6, 1, 512);
+		// uint16_t sus = map_adc(adc_4, 512, 0x7FFF);
+		// uint16_t dec = map_adc(adc_3, 1, 512);
 
+
+		// printf("%u %u %u %u\n", att, rel, dec, sus);
+
+		set_echo_drygain(map_adc(adc_2, 0, 0x8000));
+		set_echo_wetgain(map_adc(adc_1, 0, 0x8000));
 	}	
 }
