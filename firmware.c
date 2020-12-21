@@ -114,53 +114,49 @@ void main(){
 	set_osc_type(OSC3_TYPE, SINE_TYPE);
 	set_osc_type(OSC4_TYPE, SINE_TYPE);
 
-	set_matrix(MATRIX_OSC_1, MATRIX_MIXER4_IN_1);
-	set_matrix(MATRIX_OSC_2, MATRIX_MIXER4_IN_2);
-	// set_matrix(MATRIX_OSC_3, MATRIX_MIXER4_IN_3);
-	// set_matrix(MATRIX_OSC_4, MATRIX_MIXER4_IN_4);
+	set_matrix(MATRIX_OSC_1, MATRIX_COMPR_IN);
+	
 
-	set_matrix(MATRIX_ADSR_OUT, MATRIX_ECHO_IN);
-	set_matrix(MATRIX_MIXER4_OUT, MATRIX_ADSR_IN);
-
-	set_matrix(MATRIX_ECHO_OUT, MATRIX_OUTPUT_R);
-	set_matrix(MATRIX_ADSR_OUT, MATRIX_OUTPUT_L);
+	set_matrix(MATRIX_COMPR_OUT, MATRIX_OUTPUT_R);
+	set_matrix(MATRIX_COMPR_OUT, MATRIX_OUTPUT_L);
 
 	// charlie_leds_sequence_1();
 	// set_all_charlie_leds(1);
 
 	init_codec();
 
-	set_isr_callback_with_debounce(BUTTON4_ISR, enable_echo, MS(200));
-	set_timer_beat(TIMER1, BPM(240), beat_cb);
+	// set_isr_callback_with_debounce(BUTTON4_ISR, enable_echo, MS(200));
+	// set_timer_beat(TIMER1, BPM(240), beat_cb);
 	// set_isr_callback_with_debounce(BUTTON2_ISR, beat_cb, MS(200));
 	// set_isr_callback_with_debounce(BUTTON3_ISR, callback_set_echo, MS(200));
 	// set_isr_callback_with_debounce(BUTTON3_ISR, only_effects, MS(200));
 	// set_isr_callback_with_debounce(BUTTON2_ISR, toogle_filter, MS(200));
 	// set_isr_callback_with_debounce(BUTTON1_ISR, toogle_input, MS(200));
-
-    set_isr_callback_with_debounce(BUTTON1_ISR, trigger_adsr, MS(50));
+    // set_isr_callback_with_debounce(BUTTON1_ISR, trigger_adsr, MS(50));
 	
-	set_attack(adsr1, 256);
-	set_release(adsr1, 256);
-	set_decay(adsr1, 512);
-	set_sustain(adsr1, 0x7FFF);
+	// set_attack(adsr1, 256);
+	// set_release(adsr1, 256);
+	// set_decay(adsr1, 512);
+	// set_sustain(adsr1, 0x7FFF);
+
+	osc_1 =  phase_from_freq(map_adc(adc_1,50,10000));
 
 	while(1){
 		// set_codec_line_volume(map_adc(adc_1, 0, 31));
 		// float freq = (float) map_adc(adc_6, 100, 19000);
 		// printf("%f\n", freq);
-		timers[TIMER1].beat = BPM(map_adc(adc_3, 120, 2000));
-	    // osc_1 = map_adc(adc_1,50,1000);
+		// timers[TIMER1].beat = BPM(map_adc(adc_3, 120, 2000));
+		if (get_gpio(BUTTON_1))
+		{
+			osc_1 = phase_from_freq(map_adc(adc_1,50,10000));
+		}
+		
+		set_compressor_thr(map_adc(adc_2, 1, 0x7FFF));
+		set_compressor_ratio(map_adc(adc_3, 1, 0x7FFF));
+		set_compressor_attack(map_adc(adc_6, 10 ,700));
+		set_compressor_release(map_adc(adc_5, 10 ,700));
 
-		// uint16_t att = map_adc(adc_5, 1, 512);
-		// uint16_t rel = map_adc(adc_6, 1, 512);
-		// uint16_t sus = map_adc(adc_4, 512, 0x7FFF);
-		// uint16_t dec = map_adc(adc_3, 1, 512);
-
-
-		// printf("%u %u %u %u\n", att, rel, dec, sus);
-
-		set_echo_drygain(map_adc(adc_2, 0, 0x8000));
-		set_echo_wetgain(map_adc(adc_1, 0, 0x8000));
+		// set_echo_drygain(map_adc(adc_2, 0, 0x8000));
+		// set_echo_wetgain(map_adc(adc_1, 0, 0x8000));
 	}	
 }

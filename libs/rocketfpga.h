@@ -20,6 +20,7 @@
 #include <uart.h>
 #include <isr.h>
 #include <oscillators.h>
+#include <compressor.h>
 #include <gpio.h>
 
 #ifdef SHIELD_POTS
@@ -60,7 +61,7 @@
 #define MATRIX_MIXER4_IN_3 3
 #define MATRIX_MIXER4_IN_4 4
 #define MATRIX_ADSR_IN     5
-// #define MATRIX_MULT_IN_2   6
+#define MATRIX_COMPR_IN    6
 #define MATRIX_ECHO_IN     7
 #define MATRIX_OUTPUT_R    8
 #define MATRIX_OUTPUT_L    9
@@ -89,7 +90,7 @@ static const char *matrix_out_names[MATRIX_OUT+1] = {"", "MATRIX_MIXER4_IN_1",
 #define MATRIX_MIXER4_OUT   5
 #define MATRIX_ADSR_OUT     6
 #define MATRIX_ECHO_OUT     7
-#define MATRIX_ENVELOPE_OUT 8
+#define MATRIX_COMPR_OUT    8
 #define MATRIX_MOD_OUT      9
 #define MATRIX_LINE_L       10
 #define MATRIX_LINE_MIC     10
